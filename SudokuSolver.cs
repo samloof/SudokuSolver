@@ -4,7 +4,7 @@ using System.Linq;
 
 /*
  * NAME:
- *    Sudoku Solver - a program that solves and prints the solution of Sudoku boards.
+ *    Sudoku Solver - solves Sudoku boards.
  * 
  * VERSION/DATE:
  *    2018-12-01
