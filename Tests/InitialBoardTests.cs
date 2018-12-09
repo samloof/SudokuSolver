@@ -1,9 +1,9 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 
 namespace SudokuSolver
 {
     [TestFixture]
-    public class ValidationTests
+    public class InitialBoardTests
     {
         private SudokuSolver sudokuSolver = null;
         private byte[,] board = null;
