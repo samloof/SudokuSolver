@@ -7,7 +7,7 @@ using System.Linq;
  *    Sudoku Solver - solves Sudoku boards.
  * 
  * VERSION/DATE:
- *    2018-12-01
+ *    2018-12-09
  *   
  * DESCRIPTION:
  *    A 3D array is first constructed where 2 dimensions represent the board and the 3:rd represents possible values for each cell.
@@ -17,15 +17,10 @@ using System.Linq;
  * EXIT STATUS:
  *    1    Indicates that there are no possible values for cell and that the initial board has value(s) that are incorrect.
  *    2    Initial board incorrect: more than one value in same column, row or box
+ *    3    Incorrect solution
  * 
  * AUTHOR:
  *    Written by Sam Lööf.
- *    
- * TODO:
- * Check that all cells have possible values
- * Check for the solved board:
- * - no zeros in the solution
- * - number shall not appar several times in row, column or box
  */
 
 namespace SudokuSolver
@@ -85,6 +80,14 @@ namespace SudokuSolver
                 }
 
                 Move(forward, ref currentCell);
+            }
+
+            // Check solution: no zeros in the solution, number shall not appar several times in row, column or box
+            if (!IsSolution(board))
+            {
+                Console.WriteLine("No solution found.");
+                Console.ReadLine();
+                Environment.Exit(3);
             }
         }
 
@@ -216,6 +219,108 @@ namespace SudokuSolver
                 }
             }
             return numberOccurrencesOfValueInBox;
+        }
+
+        public bool IsSolution(byte[,] board)
+        {
+            // No zeroes left in the solution
+            for (byte row = 0; row < MAX; row++)
+            {
+                for (byte col = 0; col < MAX; col++)
+                {
+                    if (board[row, col] == 0)
+                        return false;
+                }
+            }
+
+            // Check 1-9 on each row, in each column and in each box
+            if (!(IsRowsSolution(board) && IsColumnsSolution(board) && IsBoxSolution(board)))
+            {
+                return false;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Returns true if each row in the solution contains digits 1-9
+        /// </summary>
+        public bool IsRowsSolution(byte[,] board)
+        {
+            for (byte row = 0; row < MAX; row++)
+            {
+                var digitsOnRow = 0;
+                for (byte col = 0; col < MAX; col++)
+                {
+                    digitsOnRow |= (1 << (board[row, col] - 1));
+                }
+                if (digitsOnRow != (Math.Pow(2, 9)-1))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Returns true if each column in the solution contains digits 1-9
+        /// </summary>
+        public bool IsColumnsSolution(byte[,] board)
+        {
+            for (byte col = 0; col < MAX; col++)
+            {
+                var digitsInCol = 0;
+                for (byte row = 0; row < MAX; row++)
+                {
+                    digitsInCol |= (1 << (board[row, col] - 1));
+                }
+                if (digitsInCol != (Math.Pow(2, 9) - 1))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Returns true if each box in the solution contains digits 1-9
+        /// </summary>
+        public bool IsBoxSolution(byte[,] board)
+        {
+            for (byte row = 0; row < MAX; row += 3)
+            {
+                for (byte col = 0; col < MAX; col += 3)
+                {
+                    if (!OneToNineInBox(board, row, col))
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Returns true if the box contains digits 1-9
+        /// </summary>>
+        private bool OneToNineInBox(byte[,] board, byte row, byte col)
+        {
+            var digitsInBox = 0;
+            for (byte r = row; r < (row + 3); r++)
+            {
+                for (byte c = col; c < (col + 3); c++)
+                {
+                    digitsInBox |= (1 << (board[r, c] - 1));
+                }
+            }
+            if (digitsInBox != (Math.Pow(2, 9) - 1))
+            {
+                return false;
+            }
+
+            return true;
         }
 
         #endregion
