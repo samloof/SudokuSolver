@@ -1,4 +1,5 @@
-using NUnit.Framework;
+﻿using NUnit.Framework;
+using SudokuSolver.Exceptions;
 
 namespace SudokuSolver
 {
@@ -80,6 +81,15 @@ namespace SudokuSolver
 
             var res = sudokuSolver.ValueMoreThanOnceBoxCheck(board);
             Assert.IsTrue(res, "Expected true since the board contain same value more than once in a box.");
+        }
+
+        [Test]
+        [Description("Verifies that Solve throws InitialBoardIncorrectException when initial board contains same digit twice in a box")]
+        public void ValueMoreThanOnceCheckTest()
+        {
+            board[4, 7] = 6; // Inserting another 6 in a box already containing 6
+
+            Assert.Throws<InitialBoardIncorrectException>(() => sudokuSolver.Solve(board), "Expected InitialBoardIncorrectException to be thrown since the initial board is incorrect.");
         }
     }
 }

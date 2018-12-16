@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 
 namespace SudokuSolver
 {
@@ -22,10 +22,20 @@ namespace SudokuSolver
                 {3, 0, 0,  0, 0, 9,  0, 0, 0},
                 {0, 0, 2,  6, 0, 8,  0, 0, 3}};
 
-            Console.WriteLine("Solution:\n");
-            sudokuSolver.Solve(board);
-            sudokuSolver.WriteBoard(board);
-            Console.ReadLine();
+            try
+            {
+                sudokuSolver.Solve(board);
+                Console.WriteLine("Solution:\n");
+                sudokuSolver.WriteBoard(board);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            finally
+            {
+                Console.ReadLine();
+            }
         }
     }
 }

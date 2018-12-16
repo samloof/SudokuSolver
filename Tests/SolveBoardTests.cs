@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using SudokuSolver.Exceptions;
 using System.Linq;
 
 namespace SudokuSolver
@@ -12,6 +13,46 @@ namespace SudokuSolver
         public void TestSetup()
         {
             sudokuSolver = new SudokuSolver();
+        }
+
+        [Test]
+        [Description("Unsolvable board 1")]
+        public void UnsolvableBoardTest1()
+        {
+            var board = new byte[,] {
+                {1, 2, 3,  7, 4, 5,  0, 0, 0},
+                {4, 5, 6,  8, 2, 3,  0, 0, 0},
+                {7, 8, 9,  6, 1, 0,  0, 0, 0},
+
+                {0, 0, 0,  0, 0, 0,  0, 0, 0},
+                {0, 0, 0,  0, 0, 0,  0, 0, 0},
+                {0, 0, 0,  0, 0, 0,  0, 0, 0},
+
+                {0, 0, 0,  0, 0, 0,  0, 0, 0},
+                {0, 0, 0,  0, 0, 0,  0, 0, 0},
+                {0, 0, 0,  0, 0, 0,  0, 0, 0}};
+
+            Assert.Throws<UnsolvableBoardException>(() => sudokuSolver.Solve(board), "Expected UnsolvableBoardException to be thrown since there is no possible value for cell in box 2.");
+        }
+
+        [Test]
+        [Description("Unsolvable board 2")]
+        public void UnsolvableBoardTest2()
+        {
+            var board = new byte[,] {
+                {0, 0, 0,  0, 0, 0,  0, 0, 0},
+                {0, 0, 0,  0, 0, 0,  0, 0, 0},
+                {0, 0, 0,  0, 0, 0,  0, 0, 0},
+
+                {0, 0, 0,  0, 0, 0,  0, 0, 0},
+                {0, 0, 0,  0, 0, 0,  0, 0, 0},
+                {0, 0, 0,  0, 0, 0,  0, 0, 0},
+
+                {0, 0, 0,  1, 2, 3,  7, 4, 5},
+                {0, 0, 0,  4, 5, 6,  8, 2, 3},
+                {0, 0, 0,  7, 8, 9,  6, 1, 0}};
+
+            Assert.Throws<UnsolvableBoardException>(() => sudokuSolver.Solve(board), "Expected UnsolvableBoardException to be thrown since there is no possible value for cell in box 2.");
         }
 
         [Test]

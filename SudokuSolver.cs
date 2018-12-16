@@ -1,3 +1,4 @@
+﻿using SudokuSolver.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,17 +8,12 @@ using System.Linq;
  *    Sudoku Solver - solves Sudoku boards.
  * 
  * VERSION/DATE:
- *    2018-12-09
+ *    2018-12-16
  *   
  * DESCRIPTION:
  *    A 3D array is first constructed where 2 dimensions represent the board and the 3:rd represents possible values for each cell.
  *    A value for a cell is set on the board if there is only one possible value for that cell. Possible values for all affected cells are then recalculated.
  *    The 3D array is then used to test different values on the board until a solution is found.
- * 
- * EXIT STATUS:
- *    1    Indicates that there are no possible values for cell and that the initial board has value(s) that are incorrect.
- *    2    Initial board incorrect: more than one value in same column, row or box
- *    3    Incorrect solution
  * 
  * AUTHOR:
  *    Written by Sam Lööf.
@@ -30,7 +26,12 @@ namespace SudokuSolver
         const byte MAX = 9;
         byte currentRow = 0;
         byte currentCol = 0;
-        
+
+        /// <summary>
+        /// Solves Sudoku boards.
+        /// Note: dependent on methods that might throw InitialBoardIncorrectException, UnsolvableBoardException etc.
+        /// </summary>
+        /// <param name="board"></param>
         public void Solve(byte[,] board)
         {
             CheckInitialBoard(board);
@@ -85,38 +86,30 @@ namespace SudokuSolver
             // Check solution: no zeros in the solution, number shall not appar several times in row, column or box
             if (!IsSolution(board))
             {
-                Console.WriteLine("No solution found.");
-                Console.ReadLine();
-                Environment.Exit(3);
+                throw new Exception("No solution found.");
             }
         }
 
         #region Verification
 
         /// <summary>
-        /// Initial check if the board’s initial state is incorrect, e.g. if the same number appears twice on the same row
+        /// Initial check if the board’s initial state is incorrect, e.g. if the same number appears twice on the same row.
+        /// Throws an InitialBoardIncorrectException if initial board has more than one value in same column, row or box.
         /// </summary>
         private void CheckInitialBoard(byte[,] board)
         {
             if (ValueMoreThanOnceRowCheck(board))
             {
-                CheckInitialBoardError("Initial board incorrect: more than one value on same row.");
+                throw new InitialBoardIncorrectException("More than one value on same row.");
             }
             if (ValueMoreThanOnceColCheck(board))
             {
-                CheckInitialBoardError("Initial board incorrect: more than one value in same column.");
+                throw new InitialBoardIncorrectException("More than one value in same column.");
             }
             if (ValueMoreThanOnceBoxCheck(board))
             {
-                CheckInitialBoardError("Initial board incorrect: more than one value in same box.");
+                throw new InitialBoardIncorrectException("More than one value in same box.");
             }
-        }
-
-        private void CheckInitialBoardError(string msg)
-        {
-            Console.WriteLine(msg);
-            Console.ReadLine();
-            Environment.Exit(2);
         }
 
         /// <summary>
@@ -444,6 +437,7 @@ namespace SudokuSolver
         /// Creates a 3D array where 2 dimensions represent the board and the third the possible values for each cell.
         /// null is used for those cells with predefined values and for cells with only one possible value.
         /// Note that this method will update the board when there are only one possible value for a cell.
+        /// Note: dependent on method that might throw UnsolvableBoardException.
         /// </summary>
         private byte[][][] GetPossibleValues(byte[,] board)
         {
@@ -476,16 +470,14 @@ namespace SudokuSolver
         /// <summary>
         /// Sets the possible values for cell (row, col) in the board.
         /// setValueOnBoardAndUpdatePossibleValues is called if there is only one possible value for the cell.
-        /// Note that this method exits the program if there are no possible values for a cell since the board doesn't have a solution if that's the case.
+        /// Throws an UnsolvableBoardException if there is no possible value(s) for a cell (the board doesn't have a solution if that's the case).
         /// </summary>
         private void SetPossibleValuesForCell(byte[,] board, byte row, byte col, byte[][][] possibleValues)
         {
             possibleValues[row][col] = GetPossibleValuesForACell(board, row, col);
             if (possibleValues[row][col].Count() == 0)
             {
-                Console.WriteLine("No possible values for cell (row, col) = (" + (row + 1) + ", " + (col + 1) + "). The initial board has value(s) that are incorrect.");
-                Environment.Exit(1);
-                Console.ReadLine();
+                throw new UnsolvableBoardException("No possible values for cell (row, col) = (" + (row + 1) + ", " + (col + 1) + ").");
             }
             else if (possibleValues[row][col].Count() == 1)
             {
